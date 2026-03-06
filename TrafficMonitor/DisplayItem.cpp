@@ -79,6 +79,9 @@ CString CommonDisplayItem::GetItemName() const
         case TDI_HDD_USAGE: return CCommon::LoadText(IDS_HDD_USAGE);
         case TDI_CPU_FREQ: return CCommon::LoadText(IDS_CPU_FREQ);
         case TDI_TODAY_TRAFFIC: return CCommon::LoadText(IDS_TRAFFIC_USED);
+        case TDI_TOP_PROCESS1: return _T("TOP 1");
+        case TDI_TOP_PROCESS2: return _T("TOP 2");
+        case TDI_TOP_PROCESS3: return _T("TOP 3");
         default:
             ASSERT(false);
             break;
@@ -144,6 +147,15 @@ std::wstring CommonDisplayItem::DefaultString(bool is_main_window) const
         case TDI_HDD_USAGE:
             default_text = CCommon::LoadText(IDS_HDD_DISP, _T(": "));
             break;
+        case TDI_TOP_PROCESS1:
+            default_text = _T("TOP1: ");
+            break;
+        case TDI_TOP_PROCESS2:
+            default_text = _T("TOP2: ");
+            break;
+        case TDI_TOP_PROCESS3:
+            default_text = _T("TOP3: ");
+            break;
         default:
             ASSERT(false);
             break;
@@ -176,6 +188,9 @@ const wchar_t* CommonDisplayItem::GetItemIniKeyName() const
         case TDI_TOTAL_SPEED: return L"total_speed_string";
         case TDI_CPU_FREQ: return L"cpu_freq_string";
         case TDI_TODAY_TRAFFIC: return L"today_traffic_string";
+        case TDI_TOP_PROCESS1: return L"top_process1_string";
+        case TDI_TOP_PROCESS2: return L"top_process2_string";
+        case TDI_TOP_PROCESS3: return L"top_process3_string";
         }
         ASSERT(FALSE);
         return L"";
@@ -268,6 +283,31 @@ CString CommonDisplayItem::GetItemValueText(bool is_main_window) const
         case TDI_TODAY_TRAFFIC:
             str_value = CCommon::KBytesToString((theApp.m_today_up_traffic + theApp.m_today_down_traffic) / 1024u);
             break;
+        //TOP进程
+        case TDI_TOP_PROCESS1:
+        case TDI_TOP_PROCESS2:
+        case TDI_TOP_PROCESS3:
+        {
+            int index = item_type - TDI_TOP_PROCESS1;
+            if (index < 0 || index >= _countof(theApp.m_top_processes))
+            {
+                str_value = _T("N/A");
+                break;
+            }
+
+            const auto& top_process = theApp.m_top_processes[index];
+            if (top_process.name.IsEmpty() || top_process.name == _T("-"))
+            {
+                str_value = _T("N/A");
+                break;
+            }
+
+            CString name = top_process.name;
+            if (name.GetLength() > 10)
+                name = name.Left(10) + _T("..");
+            str_value.Format(_T("%s: %d%%"), name.GetString(), top_process.cpu_percent);
+        }
+            break;
         default:
             break;
         }
@@ -310,6 +350,9 @@ CString CommonDisplayItem::GetItemValueSampleText(bool is_main_window) const
             break;
         case TDI_CPU_FREQ:
             sample_str = _T("1.0 GHz");
+            break;
+        case TDI_TOP_PROCESS1: case TDI_TOP_PROCESS2: case TDI_TOP_PROCESS3:
+            sample_str = _T("LongProc01..: 100%");
             break;
         default:
             sample_str = _T("99");
@@ -404,6 +447,10 @@ CString CommonDisplayItem::GetItemValueSampleText(bool is_main_window) const
             else
                 sample_str = _T("999.99MB");
         }
+            break;
+        //TOP进程
+        case TDI_TOP_PROCESS1: case TDI_TOP_PROCESS2: case TDI_TOP_PROCESS3:
+            sample_str = _T("LongProc01..: 100%");
             break;
         }
         return sample_str;

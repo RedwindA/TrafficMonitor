@@ -104,6 +104,7 @@ void CTrafficMonitorApp::LoadConfig()
     m_main_wnd_data.m_lock_window_pos = ini.GetBool(_T("config"), _T("lock_window_pos"), false);
     m_general_data.show_notify_icon = ini.GetBool(_T("config"), _T("show_notify_icon"), true);
     m_cfg_data.m_show_more_info = ini.GetBool(_T("config"), _T("show_cpu_memory"), false);
+    m_cfg_data.m_show_top_processes = ini.GetBool(_T("config"), _T("show_top_processes"), false);
     m_main_wnd_data.m_mouse_penetrate = ini.GetBool(_T("config"), _T("mouse_penetrate"), false);
     m_cfg_data.m_show_task_bar_wnd = ini.GetBool(_T("config"), _T("show_task_bar_wnd"), false);
     m_cfg_data.m_position_x = ini.GetInt(_T("config"), _T("position_x"), -1);
@@ -319,6 +320,7 @@ void CTrafficMonitorApp::SaveConfig()
     ini.WriteBool(L"config", L"lock_window_pos", m_main_wnd_data.m_lock_window_pos);
     ini.WriteBool(L"config", L"show_notify_icon", m_general_data.show_notify_icon);
     ini.WriteBool(L"config", L"show_cpu_memory", m_cfg_data.m_show_more_info);
+    ini.WriteBool(L"config", L"show_top_processes", m_cfg_data.m_show_top_processes);
     ini.WriteBool(L"config", L"mouse_penetrate", m_main_wnd_data.m_mouse_penetrate);
     ini.WriteBool(L"config", L"show_task_bar_wnd", m_cfg_data.m_show_task_bar_wnd);
     ini.WriteInt(L"config", L"position_x", m_cfg_data.m_position_x);
@@ -790,6 +792,24 @@ void CTrafficMonitorApp::InitMenuResourse()
     CCommon::LoadMenuResource(m_taskbar_menu, IDR_TASK_BAR_MENU);
     CCommon::LoadMenuResource(m_taskbar_menu_plugin, IDR_TASK_BAR_MENU);
 
+    auto insertTopProcessesMenuItem = [](CMenu& menu)
+    {
+        CMenu* main_menu = menu.GetSubMenu(0);
+        if (main_menu == nullptr)
+            return;
+        if (CCommon::GetMenuItemPosition(main_menu, ID_SHOW_TOP_PROCESSES) >= 0)
+            return;
+
+        int show_more_info_pos = CCommon::GetMenuItemPosition(main_menu, ID_SHOW_CPU_MEMORY);
+        if (show_more_info_pos >= 0)
+        {
+            CString show_top_processes_text = CCommon::LoadText(IDS_SHOW_TOP_PROCESSES);
+            main_menu->InsertMenu(show_more_info_pos + 1, MF_BYPOSITION | MF_STRING, ID_SHOW_TOP_PROCESSES, show_top_processes_text);
+        }
+    };
+    insertTopProcessesMenuItem(m_main_menu);
+    insertTopProcessesMenuItem(m_main_menu_plugin);
+
     //为插件菜单添加额外项目
     m_main_menu_plugin_sub_menu.CreatePopupMenu();
     m_main_menu_plugin_sub_menu.AppendMenu(MF_STRING | MF_ENABLED, ID_PLUGIN_OPTIONS, CCommon::LoadText(IDS_PLUGIN_OPTIONS, _T("...")));
@@ -812,8 +832,12 @@ void CTrafficMonitorApp::InitMenuResourse()
     //为菜单项添加图标
     auto addIconsForMainWindowMenu = [&](const CMenu& menu)
     {
-        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), 0, TRUE, GetMenuIcon(IDI_CONNECTION));
-        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), 11, TRUE, GetMenuIcon(IDI_FUNCTION));
+        constexpr int CONNECTION_MENU_POS{ 0 };
+        constexpr int OTHER_FUNCTIONS_MENU_POS{ 12 };
+        constexpr int HELP_MENU_POS{ 15 };
+
+        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), CONNECTION_MENU_POS, TRUE, GetMenuIcon(IDI_CONNECTION));
+        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), OTHER_FUNCTIONS_MENU_POS, TRUE, GetMenuIcon(IDI_FUNCTION));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_NETWORK_INFO, FALSE, GetMenuIcon(IDI_INFO));
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_ALWAYS_ON_TOP, FALSE, GetMenuIcon(IDI_PIN));
@@ -826,6 +850,8 @@ void CTrafficMonitorApp::InitMenuResourse()
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_CPU_MEMORY, FALSE, GetMenuIcon(IDI_MORE));
         if (!m_win_version.IsWindows11OrLater())
+            CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TOP_PROCESSES, FALSE, GetMenuIcon(IDI_TASK_MANAGER));
+        if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_TASK_BAR_WND, FALSE, GetMenuIcon(IDI_TASKBAR_WINDOW));
         if (!m_win_version.IsWindows11OrLater())
             CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_SHOW_MAIN_WND, FALSE, GetMenuIcon(IDI_MAIN_WINDOW));
@@ -834,7 +860,7 @@ void CTrafficMonitorApp::InitMenuResourse()
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_TRAFFIC_HISTORY, FALSE, GetMenuIcon(IDI_STATISTICS));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_PLUGIN_MANAGE, FALSE, GetMenuIcon(IDI_PLUGINS));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_OPTIONS, FALSE, GetMenuIcon(IDI_SETTINGS));
-        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), 14, TRUE, GetMenuIcon(IDI_HELP));
+        CMenuIcon::AddIconToMenuItem(menu.GetSubMenu(0)->GetSafeHmenu(), HELP_MENU_POS, TRUE, GetMenuIcon(IDI_HELP));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_HELP, FALSE, GetMenuIcon(IDI_HELP));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_APP_ABOUT, FALSE, GetMenuIcon(IDR_MAINFRAME));
         CMenuIcon::AddIconToMenuItem(menu.GetSafeHmenu(), ID_APP_EXIT, FALSE, GetMenuIcon(IDI_EXIT));

@@ -96,6 +96,7 @@ public:
     };
 
     const SkinInfo& GetSkinInfo() const { return m_skin_info; }
+    LayoutInfo& GetLayoutInfo() { return m_layout_info; }
     const LayoutInfo& GetLayoutInfo() const { return m_layout_info; }
     const PreviewInfo& GetPreviewInfo() const { return m_preview_info; }
 

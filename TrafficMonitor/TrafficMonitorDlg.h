@@ -24,6 +24,7 @@
 #include "PdhHardwareQuery/CpuFreq.h"
 #include "PdhHardwareQuery/GpuUsage.h"
 #include "PdhHardwareQuery/DiskUsage.h"
+#include "PdhHardwareQuery/TopProcessMonitor.h"
 #include "HistoryTrafficFile.h"
 
 // CTrafficMonitorDlg 对话框
@@ -70,6 +71,7 @@ protected:
     CPdhCpuFreq m_cpu_freq_helper;
     CPdhGPUUsage m_gpu_usage_helper;
     CPdhDiskUsage m_disk_usage_helper;
+    CTopProcessMonitor m_top_process_monitor;
 
     bool m_get_disk_usage_by_pdh{};
 
@@ -180,6 +182,7 @@ protected:
     void ApplySettings(COptionsDlg& optionsDlg);
 
     void SetItemPosition();     //设置显示的4个项目的位置
+    void UpdateTopProcessItemsVisibility();   //根据设置更新TOP进程项目的显示状态
     bool LoadSkinLayout();      //从当前皮肤获取布局数据
 
     void LoadBackGroundImage();
@@ -282,4 +285,5 @@ public:
     afx_msg void OnPluginDetailTaksbar();
     afx_msg UINT OnPowerBroadcast(UINT nPowerEvent, LPARAM nEventData);
     afx_msg void OnColorizationColorChanged(DWORD dwColorizationColor, BOOL bOpacity);
+    afx_msg void OnShowTopProcesses();
 };

@@ -363,6 +363,22 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     m_layout_info.layout_l.layout_items[TDI_DOWN].show = ini.GetBool(_T("layout"), _T("show_down_l"), true);
     m_layout_info.layout_l.layout_items[TDI_CPU].show = ini.GetBool(_T("layout"), _T("show_cpu_l"), true);
     m_layout_info.layout_l.layout_items[TDI_MEMORY].show = ini.GetBool(_T("layout"), _T("show_memory_l"), true);
+    //TOP进程布局 (layout_l)
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_x_l"), 6));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_y_l"), 40));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_width_l"), 218));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process1_align_l"), 0));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].show = ini.GetBool(_T("layout"), _T("show_top_process1_l"), false);
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_x_l"), 6));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_y_l"), 59));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_width_l"), 218));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process2_align_l"), 0));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].show = ini.GetBool(_T("layout"), _T("show_top_process2_l"), false);
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_x_l"), 6));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_y_l"), 78));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_width_l"), 218));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process3_align_l"), 0));
+    m_layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].show = ini.GetBool(_T("layout"), _T("show_top_process3_l"), false);
     m_preview_info.l_pos.x = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_l"), 0));
     m_preview_info.l_pos.y = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_l"), 47));
 
@@ -388,6 +404,22 @@ void CSkinFile::LoadFromIni(const wstring& file_path)
     m_layout_info.layout_s.layout_items[TDI_DOWN].show = ini.GetBool(_T("layout"), _T("show_down_s"), true);
     m_layout_info.layout_s.layout_items[TDI_CPU].show = ini.GetBool(_T("layout"), _T("show_cpu_s"), false);
     m_layout_info.layout_s.layout_items[TDI_MEMORY].show = ini.GetBool(_T("layout"), _T("show_memory_s"), false);
+    //TOP进程布局 (layout_s) - 默认不显示
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_x_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_y_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process1_width_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process1_align_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].show = ini.GetBool(_T("layout"), _T("show_top_process1_s"), false);
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_x_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_y_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process2_width_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process2_align_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].show = ini.GetBool(_T("layout"), _T("show_top_process2_s"), false);
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].x = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_x_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].y = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_y_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].width = theApp.DPI(ini.GetInt(_T("layout"), _T("top_process3_width_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].align = static_cast<Alignment>(ini.GetInt(_T("layout"), _T("top_process3_align_s"), 0));
+    m_layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].show = ini.GetBool(_T("layout"), _T("show_top_process3_s"), false);
     m_preview_info.s_pos.x = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_x_s"), 0));
     m_preview_info.s_pos.y = theApp.DPI(ini.GetInt(_T("layout"), _T("preview_y_s"), 0));
 }
@@ -747,6 +779,15 @@ string CSkinFile::GetDisplayItemXmlNodeName(DisplayItem display_item)
         break;
     case TDI_CPU_FREQ:
         return "cpu_freq";
+        break;
+    case TDI_TOP_PROCESS1:
+        return "top_process1";
+        break;
+    case TDI_TOP_PROCESS2:
+        return "top_process2";
+        break;
+    case TDI_TOP_PROCESS3:
+        return "top_process3";
         break;
     default:
         return string();

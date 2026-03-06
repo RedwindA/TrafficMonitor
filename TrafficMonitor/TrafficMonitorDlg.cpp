@@ -127,6 +127,7 @@ BEGIN_MESSAGE_MAP(CTrafficMonitorDlg, CDialog)
     ON_COMMAND(ID_PLUGIN_DETAIL_TASKBAR, &CTrafficMonitorDlg::OnPluginDetailTaksbar)
     ON_WM_POWERBROADCAST()
     ON_WM_DWMCOLORIZATIONCOLORCHANGED()
+    ON_COMMAND(ID_SHOW_TOP_PROCESSES, &CTrafficMonitorDlg::OnShowTopProcesses)
 END_MESSAGE_MAP()
 
 
@@ -879,9 +880,23 @@ void CTrafficMonitorDlg::SetItemPosition()
     }
 }
 
+void CTrafficMonitorDlg::UpdateTopProcessItemsVisibility()
+{
+    const bool show_top_processes{ theApp.m_cfg_data.m_show_top_processes };
+    auto& layout_info{ m_skin.GetLayoutInfo() };
+
+    layout_info.layout_l.layout_items[TDI_TOP_PROCESS1].show = show_top_processes;
+    layout_info.layout_l.layout_items[TDI_TOP_PROCESS2].show = show_top_processes;
+    layout_info.layout_l.layout_items[TDI_TOP_PROCESS3].show = show_top_processes;
+    layout_info.layout_s.layout_items[TDI_TOP_PROCESS1].show = show_top_processes;
+    layout_info.layout_s.layout_items[TDI_TOP_PROCESS2].show = show_top_processes;
+    layout_info.layout_s.layout_items[TDI_TOP_PROCESS3].show = show_top_processes;
+}
+
 bool CTrafficMonitorDlg::LoadSkinLayout()
 {
     bool rtn = m_skin.Load(CSkinManager::Instance().GetSkinName(m_skin_selected));
+    UpdateTopProcessItemsVisibility();
     if (m_skin.GetLayoutInfo().no_label)        //如果皮肤布局不显示文本，则不允许交换上传和下载的位置，因为上传和下载的位置已经固定在皮肤中了
         theApp.m_main_wnd_data.swap_up_down = false;
     return rtn;
@@ -1511,6 +1526,26 @@ void CTrafficMonitorDlg::DoMonitorAcquisition()
         }
     }
 #endif
+
+    //获取TOP进程信息
+    if (theApp.m_cfg_data.m_show_top_processes)
+    {
+        for (auto& top_process : theApp.m_top_processes)
+        {
+            top_process.name = _T("-");
+            top_process.cpu_percent = 0;
+        }
+
+        std::vector<ProcessCpuInfo> top3;
+        if (m_top_process_monitor.GetTopProcesses(top3))
+        {
+            for (int i = 0; i < 3 && i < static_cast<int>(top3.size()); i++)
+            {
+                theApp.m_top_processes[i].name = top3[i].name.c_str();
+                theApp.m_top_processes[i].cpu_percent = top3[i].cpu_percent;
+            }
+        }
+    }
 
     //通知插件获取数据，以及向插件传递监控数据
     for (const auto& plugin_info : theApp.m_plugins.GetPlugins())
@@ -2232,6 +2267,7 @@ void CTrafficMonitorDlg::OnInitMenu(CMenu* pMenu)
     pMenu->CheckMenuItem(ID_ALWAYS_ON_TOP, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_always_on_top ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_LOCK_WINDOW_POS, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_lock_window_pos ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_SHOW_CPU_MEMORY, MF_BYCOMMAND | (theApp.m_cfg_data.m_show_more_info ? MF_CHECKED : MF_UNCHECKED));
+    pMenu->CheckMenuItem(ID_SHOW_TOP_PROCESSES, MF_BYCOMMAND | (theApp.m_cfg_data.m_show_top_processes ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_MOUSE_PENETRATE, MF_BYCOMMAND | (theApp.m_main_wnd_data.m_mouse_penetrate ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_SHOW_TASK_BAR_WND, MF_BYCOMMAND | (theApp.m_cfg_data.m_show_task_bar_wnd ? MF_CHECKED : MF_UNCHECKED));
     pMenu->CheckMenuItem(ID_SHOW_MAIN_WND, MF_BYCOMMAND | (!theApp.m_cfg_data.m_hide_main_window ? MF_CHECKED : MF_UNCHECKED));
@@ -2458,6 +2494,15 @@ void CTrafficMonitorDlg::OnShowCpuMemory()
     }
     LoadBackGroundImage();
     SetItemPosition();
+    Invalidate(FALSE);
+    theApp.SaveConfig();
+}
+
+
+void CTrafficMonitorDlg::OnShowTopProcesses()
+{
+    theApp.m_cfg_data.m_show_top_processes = !theApp.m_cfg_data.m_show_top_processes;
+    UpdateTopProcessItemsVisibility();
     Invalidate(FALSE);
     theApp.SaveConfig();
 }
